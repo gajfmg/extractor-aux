@@ -12,13 +12,10 @@ import java.util.Arrays;
  * @author Gabriel
  */
 public class Extractor {
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception {
+		
 		//criar a HttpURLConnection 
-		HttpURLConnection httpcon = (HttpURLConnection) new URL("https://api.github.com/repos/gajfmg/web-app/commits").openConnection();
+		HttpURLConnection httpcon = (HttpURLConnection) new URL("https://api.github.com/repos/gajfmg/GECID-Hierarquia-Ontologica/commits/master").openConnection();
                 // Informações do Projeto https://api.github.com/repos/gajfmg/GECID-Hierarquia-Ontologica
 		
                 httpcon.addRequestProperty("User-Agent", "Mozilla/5.0");
@@ -32,16 +29,24 @@ public class Extractor {
 			//System.out.println(line);
 		}
 		in.close();
-               System.out.println(responseSB);
-               JSONObject my_obj = new JSONObject(responseSB);
-               System.out.println(my_obj);
-               
-               String nome = my_obj.getString("nome");
-              
 		
-                System.out.println("nome: " + nome);
+		//Strings
+                //Captura nome 
+		Arrays.stream(responseSB.toString().split("\"name\":")).skip(1).map(l -> l.split(",")[0]).forEach(l -> System.out.println("\n Nome do Committer: " +l));
+               //Caputra Data
+                Arrays.stream(responseSB.toString().split("\"date\":")).skip(1).map(l -> l.split(",")[0]).forEach(l -> System.out.println("\n Data do Commit: " +l));
+                // Comentario
+		 Arrays.stream(responseSB.toString().split("\"message\":")).skip(1).map(l -> l.split(",")[0]).forEach(l -> System.out.println("\n Comentário: " +l));
                 
-            
-    }
-    
+                 System.out.println("\n Arquivos Alterados: ");
+                 //Arquivos Alterados
+                 Arrays.stream(responseSB.toString().split("\"filename\":")).skip(1).map(l -> l.split(",")[0]).forEach(l -> System.out.println (l));
+	
+                
+                //Soma de Strings como dados , neste caso coma das mudanças
+                int total = Arrays.stream(responseSB.toString().split("\"changes\":")).skip(1).mapToInt(l -> Integer.parseInt(l.split(",")[0])).sum();
+		System.out.println("\n Total de mudanças efetuadas: " + total);
+		
+	}
+	
 }
